@@ -5,8 +5,10 @@
 package it.polito.tdp.imdb;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.imdb.model.Actor;
 import it.polito.tdp.imdb.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,10 +37,10 @@ public class FXMLController {
     private Button btnSimulazione; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGenere"
-    private ComboBox<?> boxGenere; // Value injected by FXMLLoader
+    private ComboBox<String> boxGenere; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxAttore"
-    private ComboBox<?> boxAttore; // Value injected by FXMLLoader
+    private ComboBox<Actor> boxAttore; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtGiorni"
     private TextField txtGiorni; // Value injected by FXMLLoader
@@ -48,17 +50,44 @@ public class FXMLController {
 
     @FXML
     void doAttoriSimili(ActionEvent event) {
-
+    	Actor a = boxAttore.getValue();
+    	List<Actor> lista = model.getAttoriSimili(a);
+    	List<Actor> lista1 = model.getAttoriRaggiungibili(a);
+    	for (Actor attore: lista1) {
+    	txtResult.appendText(attore.toString() + "\n");
+    	}
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	txtResult.clear();
+    	String genere = boxGenere.getValue();
+    	model.creaGrafo(genere);
+    	txtResult.appendText("#vertici = " + Integer.toString(model.numeroVertici()) + "\n");    
+    	txtResult.appendText("#archi = " + Integer.toString(model.numeroArchi()) + "\n");
+    	
+    	boxAttore.getItems().addAll(model.getAttori());
     }
 
     @FXML
     void doSimulazione(ActionEvent event) {
-
+    	txtResult.clear();
+    	Integer n = null;
+    	try {
+    		n = Integer.parseInt(txtGiorni.getText());
+    	} catch (NumberFormatException e) {
+    		txtResult.clear();
+        	txtResult.appendText("Inserisci un valore numerico per n!\n");;
+        	return ;
+    	}
+    	
+    	model.simulate(n);
+    	
+    	txtResult.appendText("PAUSE: " + model.getPauses() + "\n\n");
+    	txtResult.appendText("ATTORI INTERVISTATI: \n");
+    	for(Actor a : model.getInterviewedActors()) {
+    		txtResult.appendText(a.toString() + "\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -75,5 +104,6 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	boxGenere.getItems().addAll(model.getGeneri());
     }
 }

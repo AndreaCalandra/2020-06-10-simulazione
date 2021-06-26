@@ -1,6 +1,6 @@
 package it.polito.tdp.imdb.model;
 
-public class Actor{
+public class Actor implements Comparable{
 	Integer id;
 	String firstName;
 	String lastName;
@@ -68,6 +68,19 @@ public class Actor{
 			return false;
 		return true;
 	}
+	
+	public String getNomeCognome() {
+		return lastName+firstName;
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		// TODO Auto-generated method stub
+		Actor a = (Actor) o;
+		return this.getNomeCognome().compareTo(a.getNomeCognome());
+	}
+	
+	
 
 	
 }
